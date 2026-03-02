@@ -1,0 +1,22 @@
+task_name: "activation_inference_ppr10k"
+
+data:
+  dataset_name: "ppr10k"
+  feedback_dataset_path: "experiments/ppr10k_data_student/ppr10k/InternVL3_5-8B-HF/zero_shot_memorability_prompt"
+  testset_scenes_path: "config/test_set_scenes_seed42.json"
+  filter_criteria: "less_higher_two_elements"
+
+model: 
+  max_new_tokens: 128
+  use_flash_attention_2: true
+  batch_size: 4
+
+activation_settings:
+  coeff: 55
+  target_layer: 12
+  negative_actvs_file: "experiments/activation_extraction_ppr10k/negative/ppr10k/InternVL3_5-8B-HF/training_prompt/actvs_vector.pt"
+  positive_actvs_file: "experiments/activation_extraction_ppr10k/positive/ppr10k/InternVL3_5-8B-HF/training_prompt/actvs_vector.pt"
+
+prompt:
+  version: "inference_prompt"
+  schema: false

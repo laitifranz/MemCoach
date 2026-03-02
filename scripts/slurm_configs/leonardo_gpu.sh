@@ -1,0 +1,20 @@
+SLURM_NODES='1'
+SLURM_TASKS='1'
+SLURM_CPU='8'
+SLURM_GPU='1'
+SLURM_MEM='32GB'
+SLURM_TIME='24:00:00'
+SLURM_NAME='default_leonardo_gpu'
+
+SLURM_PARTITION='boost_usr_prod'
+SLURM_ACCOUNT=<YOUR_PROJECT_NAME>
+SLURM_QOS='normal'
+
+MAIL_TYPE='ALL'
+MAIL_USER='francesco.laiti@unitn.it'
+
+BEFORE_CODE_BLOCK=(
+    'export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK'
+    'export HF_HUB_OFFLINE=1'
+    'export NCCL_DEBUG=INFO'
+)

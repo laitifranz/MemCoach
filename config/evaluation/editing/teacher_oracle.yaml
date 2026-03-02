@@ -1,0 +1,17 @@
+task_name: "evaluation/editing/teacher_oracle"
+
+data:
+  dataset_name: "ppr10k"
+  feedback_dataset_path: "experiments/ppr10k_data_teacher/ppr10k/InternVL3_5-8B-HF/feedback_elicitation_prompt"
+  testset_scenes_path: "config/test_set_scenes_seed42.json"
+  filter_criteria: "less_higher_two_elements"
+
+editing_model:
+  model:
+    provider: "flux/kontext"
+    name: "black-forest-labs/FLUX.1-Kontext-dev"
+
+target_predictor:
+  model:
+    provider: "ours"
+    mlp_checkpoint_path: "ckpt/target_predictor/memorability/ours/model_weights.pth"

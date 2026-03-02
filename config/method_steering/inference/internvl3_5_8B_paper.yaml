@@ -1,0 +1,24 @@
+task_name: "activation_inference_ppr10k"
+
+data:
+  dataset_name: "ppr10k"
+  feedback_dataset_path: "experiments/ppr10k_data_student/ppr10k/InternVL3_5-8B-HF/zero_shot_memorability_prompt"
+  testset_scenes_path: "config/test_set_scenes_seed42.json"
+  filter_criteria: "less_higher_two_elements"
+
+model:
+  provider: "hf"
+  name: "OpenGVLab/InternVL3_5-8B-HF"
+  max_new_tokens: 128
+  use_flash_attention_2: true
+  batch_size: 4
+
+activation_settings:
+  coeff: 55
+  target_layer: 12
+  module: "residual"
+  steering_vector_file: "ckpt/memcoach/memcoach_internvl_paper.pt"
+
+prompt:
+  version: "inference_prompt"
+  schema: false

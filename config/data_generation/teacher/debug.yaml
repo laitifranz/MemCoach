@@ -1,0 +1,14 @@
+task_name: "[DEBUG]_ppr10k_data_pipeline_generation"
+
+data:
+  dataset_name: "ppr10k"
+  subfolder: ""
+  target_score_path: "experiments/target_predictor/ours/ppr10k"
+
+model: 
+  provider: "hf"
+  name: "trl-internal-testing/tiny-InternVLForConditionalGeneration"
+  max_new_tokens: 8
+
+prompt:
+  version: "feedback_elicitation_prompt"

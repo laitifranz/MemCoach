@@ -1,0 +1,9 @@
+defaults:
+ - internvl3_5_8B_paper
+ - _self_
+
+runtime:
+  overwrite: false
+  dry_run: false
+  include_datetime: false
+  strict_config: false

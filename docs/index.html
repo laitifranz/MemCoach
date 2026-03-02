@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="How to Take a Memorable Picture? Empowering Users with Actionable Feedback - Francesco Laiti, Davide Talon, Jacopo Staiano, Elisa Ricci">
+  <meta name="description" content="[CVPR 2026] MemCoach: Training-Free MLLM for Actionable Image Memorability Feedback">
+  <meta name="keywords" content="memorability, mllm, vlm, computational photography, perceptual understanding, visual assistant, machine learning, computer vision, AI">
+  <meta name="author" content="Francesco Laiti, Davide Talon, Jacopo Staiano, Elisa Ricci">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="University of Trento, University of Pisa, Fondazione Bruno Kessler">
+  <meta property="og:title" content="How to Take a Memorable Picture? Empowering Users with Actionable Feedback">
+  <meta property="og:description" content="[CVPR 2026] MemCoach: Training-Free MLLM for Actionable Image Memorability Feedback">
+  <meta property="og:url" content="https://laitifranz.github.io/MemCoach/">
+  <meta property="og:image" content="https://laitifranz.github.io/MemCoach/static/images/paper/teaser.webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="How to Take a Memorable Picture? Empowering Users with Actionable Feedback - Research Preview">
+  <meta property="article:published_time" content="2026-02-21T00:00:00.000Z">
+  <meta property="article:author" content="Laiti, Francesco">
+  <meta property="article:section" content="Research">
+  <meta property="article:tag" content="memorability">
+  <meta property="article:tag" content="mllm">
+  <meta property="article:tag" content="vlm">
+  <meta property="article:tag" content="computational photography">
+  <meta property="article:tag" content="perceptual understanding">
+  <meta property="article:tag" content="visual assistant">
+  <meta property="article:tag" content="machine learning">
+  <meta property="article:tag" content="computer vision">
+  <meta property="article:tag" content="AI">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:creator" content="@laitifranz">
+  <meta name="twitter:title" content="How to Take a Memorable Picture? Empowering Users with Actionable Feedback">
+  <meta name="twitter:description" content="[CVPR 2026] MemCoach: Training-Free MLLM for Actionable Image Memorability Feedback">
+  <meta name="twitter:image" content="https://laitifranz.github.io/MemCoach/static/images/paper/teaser.webp">
+  <meta name="twitter:image:alt" content="How to Take a Memorable Picture? Empowering Users with Actionable Feedback - Research Preview">
+
+  <!-- Academic/Research Specific -->
+  <meta name="citation_title" content="How to Take a Memorable Picture? Empowering Users with Actionable Feedback">
+  <meta name="citation_author" content="Laiti, Francesco">
+  <meta name="citation_author" content="Talon, Davide">
+  <meta name="citation_author" content="Staiano, Jacopo">
+  <meta name="citation_author" content="Ricci, Elisa">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_conference_title" content="CVPR">
+  <meta name="citation_pdf_url" content="http://arxiv.org/abs/2602.21877">
+  
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#2563eb">
+  <meta name="msapplication-TileColor" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://ajax.googleapis.com">
+  <link rel="preconnect" href="https://documentcloud.adobe.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+  <title>How to Take a Memorable Picture? Empowering Users with Actionable Feedback - Francesco Laiti, Davide Talon, Jacopo Staiano, Elisa Ricci | Academic Research</title>
+  
+  <!-- Favicon and App Icons, generated via https://realfavicongenerator.net/ --> 
+  <link rel="icon" type="image/png" href="static/images/icon/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="static/images/icon/favicon.svg" />
+  <link rel="shortcut icon" href="static/images/icon/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="static/images/icon/apple-touch-icon.png" />
+
+  <!-- Critical CSS - Load synchronously -->
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+  
+  <!-- Non-critical CSS - Load asynchronously -->
+  <link rel="preload" href="static/css/bulma-carousel.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/bulma-slider.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" crossorigin="anonymous">
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  
+  <!-- Fallback for browsers that don't support preload -->
+  <noscript>
+    <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  </noscript>
+  
+  <!-- Fonts - Optimized loading -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Defer non-critical JavaScript -->
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="static/js/bulma-carousel.min.js"></script>
+  <script defer src="static/js/bulma-slider.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+  
+  <!-- Structured Data for Academic Papers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "How to Take a Memorable Picture? Empowering Users with Actionable Feedback",
+    "description": "[CVPR 2026] MemCoach: Training-Free MLLM for Actionable Image Memorability Feedback",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "Francesco Laiti",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "University of Trento, University of Pisa"
+        }
+      },
+      {
+        "@type": "Person",
+        "name": "Davide Talon",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "Fondazione Bruno Kessler"
+        }
+      },
+      {
+        "@type": "Person",
+        "name": "Jacopo Staiano",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "University of Trento"
+        }
+      },
+      {
+        "@type": "Person",
+        "name": "Elisa Ricci",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "University of Trento, Fondazione Bruno Kessler"
+        }
+      }
+    ],
+    "datePublished": "2026-02-21",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Conference on Computer Vision and Pattern Recognition (CVPR) 2026"
+    },
+    "url": "https://laitifranz.github.io/MemCoach/",
+    "image": "https://laitifranz.github.io/MemCoach/static/images/paper/teaser.webp",
+    "keywords": ["memorability feedback", "memorability coaching", "memorability improvement", "memorability prediction", "memorability editing", "memorability training", "memorability evaluation", "memorability benchmark", "memorability dataset", "memorability metric", "memorability measure", "memorability score", "memorability ranking", "memorability classification", "memorability regression", "memorability generation", "memorability editing", "memorability training", "memorability evaluation", "memorability benchmark", "memorability dataset", "memorability metric", "memorability measure", "memorability score", "memorability ranking", "memorability classification", "memorability regression", "memorability generation"],
+    "abstract": "Image memorability, i.e., how likely an image is to be remembered, has traditionally been studied in computer vision either as a passive prediction task, with models regressing a scalar score, or with generative methods altering the visual input to boost the image likelihood of being remembered. Yet, none of these paradigms supports users at capture time, when the crucial question is how to improve a photo memorability. We introduce the task of Memorability Feedback (MemFeed), where an automated model should provide actionable, human-interpretable guidance to users with the goal to enhance an image future recall. We also present MemCoach, the first approach designed to provide concrete suggestions in natural language for memorability improvement (e.g., “emphasize facial expression,” “bring the subject forward”). Our method, based on Multimodal Large Language Models (MLLMs), is training-free and employs a teacher-student steering strategy, aligning the model internal activations toward more memorable patterns learned from a teacher model progressing along least-to-most memorable samples. To enable systematic evaluation on this novel task, we further introduce MemBench, a new benchmark featuring sequence-aligned photoshoots with annotated memorability scores. Our experiments, considering multiple MLLMs, demonstrate the effectiveness of MemCoach, showing consistently improved performance over several zero-shot models. The results indicate that memorability can not only be predicted but also taught and instructed, shifting the focus from mere prediction to actionable feedback for human creators. Dataset and code will be publicly released upon publication.",
+    "citation": "Laiti, F., Talon, D., Staiano, J., and Ricci, E. How to Take a Memorable Picture? Empowering Users with Actionable Feedback. CVPR 2026.",
+    "isAccessibleForFree": true,
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "mainEntity": {
+      "@type": "WebPage",
+      "@id": "https://laitifranz.github.io/MemCoach/"
+    },
+    "about": [
+      {
+        "@type": "Thing",
+        "name": "Memorability Feedback"
+      },
+      {
+        "@type": "Thing", 
+        "name": "Memorability Coaching"
+      }
+    ]
+  }
+  </script>
+  
+  <!-- Website/Organization Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "MHUG Lab",
+    "url": "https://mhug.disi.unitn.it"
+  }
+  </script>
+
+  <!-- Custom Styles -->
+  <style>
+    .venue-badge {
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: inline-block;
+        margin: 1rem 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .divider-light {
+      border: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.15); /* very light */
+      margin: 1.25rem 0;
+    }
+    .inline-colorbox {
+      padding: 0.1em 0.35em;
+      border-radius: 0.25em;
+      display: inline-block;
+    }
+    .methodgreen {
+      background: rgb(213, 232, 212);
+    }
+    .oraclered {
+      background: rgba(239, 68, 68, 0.15);
+    }
+    .zsblue {
+      background: rgba(117, 215, 251, 0.19);
+    }
+    .specializedyellow {
+      background: rgba(250, 204, 21, 0.19);
+    }
+    .positiveblue {
+      background: #55c2f8;
+    }
+    .negativered {
+      background: #f1312a;
+    }
+    .inferencesteeringyellow {
+      background: #ffe67696;
+    }
+    .steeringextractionblue {
+      background: #a6caec92;
+    }
+    .contrastivedatapink {
+      background: #f1ceedac;
+    }
+    .gradienttext {
+      background: linear-gradient(90deg, rgb(241, 50, 42), rgb(85, 194, 248));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+    .project-footer {
+      padding: 2.5rem 1.5rem;
+    }
+    .project-footer-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.9rem;
+      text-align: center;
+    }
+    .footer-meta {
+      margin: 0;
+      color: #64748b;
+      max-width: 62ch;
+      font-size: 0.96rem;
+    }
+    .footer-tagline {
+      margin: 0;
+      padding: 0.45rem 0.85rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 999px;
+      background: #ffffff;
+      color: #1e293b;
+      font-weight: 500;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+    .footer-signature {
+      margin: 0;
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-E904EHVPM3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-E904EHVPM3');
+</script>
+
+<body>
+
+
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+
+  <!-- More Works Dropdown -->
+  <div class="more-works-container">
+    <button class="more-works-btn" onclick="window.open('https://mhug.disi.unitn.it', '_blank')" title="Our Lab">
+      <i class="fas fa-flask"></i>
+      Our Lab
+      <i class="fas fa-external-link-alt"></i>
+    </button>
+  </div>
+
+  <main id="main-content">
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <!-- TODO: Replace with your paper title -->
+            <h1 class="title is-1 publication-title">How to Take a <span class="gradienttext">Memorable</span> Picture? Empowering Users with Actionable Feedback</span></h1>
+            <div class="is-size-5 publication-authors">
+              <!-- TODO: Replace with your paper authors and their personal links -->
+              <span class="author-block">
+                <a href="https://laitifranz.github.io/" target="_blank">Francesco Laiti</a><sup>1,2</sup></span>
+                <span class="author-block">
+                  <a href="https://davidetalon.github.io/" target="_blank">Davide Talon</a><sup>3</sup></span>
+                  <span class="author-block">
+                    <a href="https://www.staiano.net/" target="_blank">Jacopo Staiano</a><sup>1</sup></span>
+                  <span class="author-block">
+                    <a href="https://eliricci.eu/" target="_blank">Elisa Ricci</a><sup>1,3</sup></span>
+            </div>
+                  <div class="is-size-6 publication-authors publication-affiliations">
+                    <!-- TODO: Replace with your institution and conference/journal info -->
+                    <span class="author-block">
+                      University of Trento<sup>1</sup>
+                      &nbsp;&nbsp;
+                      University of Pisa<sup>2</sup>
+                      &nbsp;&nbsp;
+                      Fondazione Bruno Kessler<sup>3</sup>
+                      <br>
+                      <div class="venue-badge">CVPR 2026 🎉</div>
+                    </span>
+                    <!-- TODO: Remove this line if no equal contribution -->
+                    <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
+                  </div>
+
+                  <div class="column has-text-centered">
+                    <div class="publication-links">
+                         <!-- TODO: Update with your arXiv paper ID -->
+                      <!-- <span class="link-block">
+                        <a href="https://arxiv.org/pdf/<ARXIV PAPER ID>.pdf" target="_blank"
+                        class="external-link button is-normal is-rounded is-dark">
+                        <span class="icon">
+                          <i class="fas fa-file-pdf"></i>
+                        </span>
+                        <span>Paper</span>
+                      </a>
+                    </span> -->
+
+                <!-- TODO: Update with your arXiv paper ID -->
+                <span class="link-block">
+                  <a href="http://arxiv.org/abs/2602.21877" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                  </a>
+                </span>
+
+                  <!-- TODO: Replace with your GitHub repository URL -->
+                  <span class="link-block">
+                    <a href="https://github.com/laitifranz/MemCoach" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fa-brands fa-github"></i>
+                    </span>
+                    <!-- <span>Code</span> -->
+                    <span>MemCoach</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="https://huggingface.co/datasets/laitifranz/MemBench" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="Hugging Face" style="width:1em;height:1em;vertical-align:-0.125em;">
+                  </span>
+                  <span>MemBench</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="https://huggingface.co/datasets/laitifranz/MemBench-InternVL3.5-Eval" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="Hugging Face" style="width:1em;height:1em;vertical-align:-0.125em;">
+                  </span>
+                  <span>MemBench Eval Artifacts</span>
+                  </a>
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" style="padding-top: 0;">
+  <div class="container is-max-desktop">
+      <!-- Teaser. -->
+      <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+              <div class="content has-text-justified">
+                  <img src="./static/images/paper/teaser.webp" alt="MemCoach teaser" style="width: 80%; height: auto; display: block; margin: 0 auto;"/>
+                  <br>
+                  <p>
+                    Given an input photo, <b><span class="gradienttext">memorability feedback</span></b> aims to
+                    generate <b>natural-language suggestions</b> to guide users toward a
+                    more memorable shot. MemCoach provides memorability-aware
+                    feedback, effectively <b>assisting users</b> to capture memorable images.
+                  </p>
+              </div>
+          </div>
+      </div>
+      <!--/ Teaser. -->
+  </div>
+</section>
+
+
+<!-- Key contributions -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Key Contributions</h2>
+        <div class="content has-text-justified">
+          <!-- TODO: Replace with your paper abstract -->
+          <p>
+          <ul>
+            <li>First work to formalize <b><span class="gradienttext">Memorability Feedback</span> (MemFeed)</b>: generating actionable, natural-language guidance to improve image memorability at capture time</li>
+            <li><b>Introduction of MemCoach</b>, a training-free teacher-student activation steering framework that injects memorability-aware behavior into Multimodal LLMs</li>
+            <li>Novel <b>contrastive activation steering strategy</b> that distills memorability directions from teacher-aware <i>vs.</i> student-neutral feedback</li>
+            <li><b>Release of MemBench</b>, a benchmark for memorability feedback training and evaluation</li>
+            <li><b>New evaluation protocol</b> combining editing-based memorability improvement metrics and perplexity-based feedback alignment</li>
+            <li><b>Consistent improvements</b> across multiple open MLLMs (e.g., InternVL3.5, Qwen2.5-VL, Idefics3, LLaVA-OneVision)</li>
+            <li><b>Conceptual shift</b> from memorability prediction or post-hoc editing to interactive visual coaching, demonstrating that memorability can be taught through guidance rather than estimated as a scalar property</li>
+          </ul>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Key contributions -->
+
+
+<!-- Paper abstract -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <!-- TODO: Replace with your paper abstract -->
+          <p>
+            Image memorability, <i>i.e.</i>, how likely an image is to be remembered, has traditionally been studied in computer vision either as a passive prediction task, with models regressing a scalar score, or with generative methods altering the visual input to boost the image likelihood of being remembered. Yet, none of these paradigms supports users at capture time, when the crucial question is how to improve a photo memorability. We introduce the task of <b>Mem</b>orability <b>Feed</b>back (<b>MemFeed</b>), where an automated model should provide actionable, human-interpretable guidance to users with the goal to enhance an image future recall. We also present <b>MemCoach</b>, the first approach designed to provide concrete suggestions in natural language for memorability improvement (e.g., “emphasize facial expression,” “bring the subject forward”). Our method, based on Multimodal Large Language Models (MLLMs), is training-free and employs a teacher-student steering strategy, aligning the model internal activations toward more memorable patterns learned from a teacher model progressing along least-to-most memorable samples. To enable systematic evaluation on this novel task, we further introduce <b>MemBench</b>, a new benchmark featuring sequence-aligned photoshoots with annotated memorability scores. Our experiments, considering multiple MLLMs, demonstrate the effectiveness of MemCoach, showing consistently improved performance over several zero-shot models. The results indicate that memorability can not only be predicted but also taught and instructed, shifting the focus from mere prediction to actionable feedback for human creators. Dataset and code will be publicly released upon publication.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End paper abstract -->
+
+<!-- Method -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Method</h2>
+        <div class="content has-text-justified">
+          <!-- TODO: Replace with your paper abstract -->
+          <img src="./static/images/paper/method.webp" alt="MemCoach method" />
+          <b><center>Overview of the proposed method.</center></b>
+          <p>
+            <br>
+            The framework consists of three main stages: 
+            <ul>
+              <li><b><span class="inline-colorbox contrastivedatapink">(a) Contrasting data generation</span></b>: paired samples are built by coupling the memorability-aware guidance of a teacher MLLM with the neutral responses of a student MLLM on the same scene;</li>
+              <li><b><span class="inline-colorbox steeringextractionblue">(b) Steering vector extraction</span></b>: activation differences between memorability-aware and neutral feedback are averaged to obtain a memorability steering vector capturing the latent shift toward effective suggestions for memorability;</li>
+              <li><b><span class="inline-colorbox inferencesteeringyellow">(c) Inference with MLLM steering</span></b>: the student activations are shifted using the memorability steering vector to produce improved, memorability-oriented feedback without additional training.</li>
+            </ul>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Method -->
+
+
+<!-- Dataset -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">MemBench</h2>
+        <div class="content has-text-justified">
+          <!-- TODO: Replace with your paper abstract -->
+          <img src="./static/images/paper/data-pipeline.webp" alt="MemBench data pipeline" />
+          <b><center>Overview of MemBench generation and evaluation.</center></b> 
+          <p>
+            <ul>
+              <li><b>Top</b>: Data pipeline for constructing MemBench, including scene grouping, memorability regression, image ranking, and generation of actionable memorability-aware feedback.</li>
+              <li><b>Bottom</b>: Evaluation pipeline assessing feedback quality through editing-based memorability improvement and perplexity scoring.</li>
+            </ul>
+          </p>
+        </div>
+        
+        <hr>
+        
+        <div class="content has-text-justified">
+          <!-- TODO: Replace with your paper abstract -->
+          <img src="./static/images/paper/statistics.webp" alt="MemBench statistics" />
+          <b><center>MemBench statistics.</center></b>
+          <p>
+            <br>
+            Data analysis in terms of <b>(a)</b> most frequent words; <b>(b)</b> distribution of memorability scores for the least and most memorable images within each scene; <b>(c)</b> feedback length as measured by content words; and <b>(d)</b> categorization of atomic sub-actions, where the width of each chord indicates the frequency of co-occurrence between categories.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Dataset -->
+
+
+<!-- Qualitative Results -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Qualitative Results</h2>
+        <div class="content has-text-justified">
+          <!-- TODO: Replace with your paper abstract -->
+          <img src="./static/images/paper/qualitatives-feedback.webp" alt="MemCoach method" />
+          <b><center>Qualitative feedback from MemCoach.</center></b>
+          <p>  
+            <br>
+            For each source image (left), the model provides natural-language feedback (bottom) that is applied to produce the destination image (right). Each score represents the Relative Memorability (RM), indicating how suggested feedback affects memorability. MemCoach provides human-interpretable and actionable feedback that translates into semantic changes for overall improved memorability. Observed failure cases propose to remove out-of-context elements.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Qualitative Results -->
+
+
+<!-- Quantitative Results -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Quantitative Results</h2>
+        <div class="content has-text-justified">
+          <!-- TODO: Replace with your paper abstract -->
+          <img
+            src="./static/images/paper/table-results.webp"
+            alt="Comparison with state-of-the-art models"
+            style="width: 50%; height: auto; display: block; margin: 0 auto;"
+          />
+          <b><center>Comparison with state-of-the-art models.</center></b>
+          <p>  
+            <br>
+            MemFeed performance of
+            <span class="inline-colorbox methodgreen">MemCoach</span>
+            when comparing to several
+            <span class="inline-colorbox oraclered">teacher oracle</span>,
+            <span class="inline-colorbox zsblue">zero-shot</span> and
+            <span class="inline-colorbox specializedyellow">aesthetics specialized</span>
+            MLLMs. MemFeed achieves the best results in the considered metrics. Best results in
+            <strong>bold</strong>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Quantitative Results -->
+
+
+<template>
+<!-- Image carousel -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+       <div class="item">
+        <!-- TODO: Replace with your research result images -->
+        <img src="static/images/carousel1.jpg" alt="First research result visualization" loading="lazy"/>
+        <!-- TODO: Replace with description of this result -->
+        <h2 class="subtitle has-text-centered">
+          First image description.
+        </h2>
+      </div>
+      <div class="item">
+        <!-- Your image here -->
+        <img src="static/images/carousel2.jpg" alt="Second research result visualization" loading="lazy"/>
+        <h2 class="subtitle has-text-centered">
+          Second image description.
+        </h2>
+      </div>
+      <div class="item">
+        <!-- Your image here -->
+        <img src="static/images/carousel3.jpg" alt="Third research result visualization" loading="lazy"/>
+        <h2 class="subtitle has-text-centered">
+         Third image description.
+       </h2>
+     </div>
+     <div class="item">
+      <!-- Your image here -->
+      <img src="static/images/carousel4.jpg" alt="Fourth research result visualization" loading="lazy"/>
+      <h2 class="subtitle has-text-centered">
+        Fourth image description.
+      </h2>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+<!-- End image carousel -->
+
+
+
+
+<!-- Youtube video -->
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <!-- Paper video. -->
+      <h2 class="title is-3">Video Presentation</h2>
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          
+          <div class="publication-video">
+            <!-- TODO: Replace with your YouTube video ID -->
+            <iframe src="https://www.youtube.com/embed/JkaxUblCGz0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End youtube video -->
+
+
+<!-- Video carousel -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-3">Another Carousel</h2>
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="item item-video1">
+          <!-- TODO: Add poster image for better preview -->
+          <video poster="" id="video1" controls muted loop height="100%" preload="metadata">
+            <!-- Your video file here -->
+            <source src="static/videos/carousel1.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-video2">
+          <!-- TODO: Add poster image for better preview -->
+          <video poster="" id="video2" controls muted loop height="100%" preload="metadata">
+            <!-- Your video file here -->
+            <source src="static/videos/carousel2.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-video3">
+          <!-- TODO: Add poster image for better preview -->
+          <video poster="" id="video3" controls muted loop height="100%" preload="metadata">
+            <!-- Your video file here -->
+            <source src="static/videos/carousel3.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End video carousel -->
+</template>
+
+
+
+
+
+<!-- Paper poster -->
+ <template>
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title">Poster</h2>
+
+      <!-- TODO: Replace with your poster PDF -->
+      <iframe  src="static/pdfs/sample.pdf" width="100%" height="550">
+          </iframe>
+        
+      </div>
+    </div>
+  </section>
+</template>
+<!--End paper poster -->
+
+
+
+<!--BibTex citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <div class="bibtex-header">
+        <h2 class="title">BibTeX</h2>
+        <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
+          <i class="fas fa-copy"></i>
+          <span class="copy-text">Copy</span>
+        </button>
+      </div>
+      <pre id="bibtex-code"><code>@inproceedings{laiti2026memcoach,
+  title={How to Take a Memorable Picture? Empowering Users with Actionable Feedback},
+  author={Laiti, Francesco and Talon, Davide and Staiano, Jacopo and Ricci, Elisa},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  year={2026}
+}</code></pre>
+    </div>
+</section>
+<!--End BibTex citation -->
+
+
+
+
+  <footer class="footer project-footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content project-footer-content">
+          <p class="footer-meta">
+            Built with the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank" rel="noopener noreferrer">Academic Project Page Template</a>
+            (adapted from <a href="https://nerfies.github.io" target="_blank" rel="noopener noreferrer">Nerfies</a>).
+            Licensed under <a rel="license noopener noreferrer" href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a>.
+          </p>
+          <p class="footer-tagline">Better feedback, more memorable moments.</p>
+          <p class="footer-signature">Made with ❤️ by <a href="https://laitifranz.github.io/" target="_blank" rel="noopener noreferrer">laitifranz</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Statcounter tracking code -->
+  
+<!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
+
+    <!-- End of Statcounter Code -->
+
+  </body>
+  </html>

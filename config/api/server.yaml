@@ -1,0 +1,12 @@
+runtime:
+  host: 0.0.0.0
+  port: 8000
+
+memorability:
+  provider: ours
+  mlp_checkpoint_path: ckpt/target_predictor/memorability/ours/model_weights.pth
+
+feedback:
+  hydra_config: config/method_steering/inference/internvl3_5_8B_paper.yaml
+  coeff_override: null
+  target_layer_override: null

@@ -1,0 +1,8 @@
+{
+    "test_spearman": 0.8263842039427626,
+    "input_dim": 1152,
+    "hidden_dim": 256,
+    "normalize_fts": false,
+    "backbone_model": "ViT-SO400M-14-SigLIP-384",
+    "pretrained_backbone_model": "webli"
+}

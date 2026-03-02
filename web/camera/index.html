@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MemCoach Camera</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="status-bar">
+        <div id="health-chip" class="chip chip--pending">Checking server…</div>
+        <div class="score-cluster">
+          <span id="badge-delta" class="delta-pill delta-pill--compact delta-pill--neutral">Δ —</span>
+          <div id="score-badge" class="score-badge" aria-live="polite" aria-label="Memorability score">
+            <span class="score-badge__label">Mem score</span>
+            <span id="score-badge-value" class="score-badge__value">—</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="camera-panel">
+        <video id="camera-feed" autoplay playsinline muted></video>
+        <canvas id="capture-canvas" width="0" height="0"></canvas>
+        <div id="loading-overlay" class="overlay hidden">Processing…</div>
+      </section>
+
+      <section class="controls">
+        <button id="score-btn" class="primary" type="button">Mem Score</button>
+        <button id="score-feedback-btn" class="secondary" type="button">Score + Feedback</button>
+      </section>
+
+      <section class="feedback-panel" aria-live="polite">
+        <div class="feedback-panel__header">
+          <h3>Feedback</h3>
+          <span class="feedback-panel__hint">Tap to expand details</span>
+        </div>
+        <div
+          id="feedback-chip"
+          class="feedback-card placeholder"
+          role="button"
+          tabindex="0"
+          aria-label="Latest feedback"
+        >
+          Feedback will appear here after you run a score with feedback.
+        </div>
+      </section>
+
+      <section class="results" aria-live="polite">
+        <div class="results-header">
+          <h2>Latest Results</h2>
+          <span class="meta">Tracking your last 10 runs</span>
+        </div>
+        <div class="results-current">
+          <div class="results-current__main">
+            <p class="results-current__label">Current score</p>
+            <p id="score-value" class="score">No score yet</p>
+          </div>
+          <div class="results-current__meta">
+            <span id="latency-label" class="meta"></span>
+            <span id="results-delta" class="delta-pill">Δ —</span>
+          </div>
+        </div>
+        <ol id="results-list" class="results-list" aria-label="Latest score history">
+          <li class="results-empty">Run a score to populate history.</li>
+        </ol>
+        <div id="toast" class="toast hidden"></div>
+      </section>
+    </main>
+
+    <dialog id="feedback-dialog">
+      <h3>Feedback</h3>
+      <p id="dialog-text"></p>
+      <button id="dialog-close" type="button">Close</button>
+    </dialog>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>

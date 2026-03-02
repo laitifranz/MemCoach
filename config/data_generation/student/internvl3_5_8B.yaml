@@ -1,0 +1,16 @@
+task_name: "ppr10k_data_student"
+
+data:
+  dataset_name: "ppr10k"
+  subfolder: ""
+  target_score_path: "experiments/target_predictor/ours/ppr10k"
+
+model: 
+  provider: "hf"
+  name: "OpenGVLab/InternVL3_5-8B-HF"
+  max_new_tokens: 1024
+  use_flash_attention_2: true
+  batch_size: 4
+
+prompt:
+  version: "zero_shot_memorability_prompt"
