@@ -5,6 +5,10 @@ from pathlib import Path
 import yaml
 
 
+def _is_default_placeholder(raw_value: str) -> bool:
+    return "<" in raw_value and ">" in raw_value
+
+
 def load_yaml_config(config_path: str) -> dict:
     with open(config_path, "r") as handle:
         loaded = yaml.safe_load(handle)
@@ -28,7 +32,7 @@ def _resolve_env_path(var_name: str, project_root: Path) -> Path:
 
 def resolve_project_root() -> Path:
     env_root = os.getenv("__PROJECT_ROOT__")
-    if env_root:
+    if env_root and not _is_default_placeholder(env_root):
         return Path(env_root).resolve()
     return Path(__file__).resolve().parents[2]
 
@@ -36,7 +40,7 @@ def resolve_project_root() -> Path:
 def resolve_project_dataset_root() -> Path:
     project_root = resolve_project_root()
     raw_value = os.getenv("__PROJECT_DATASET_ROOT__")
-    if not raw_value:
+    if not raw_value or _is_default_placeholder(raw_value):
         return project_root / "dataset"
     path = Path(raw_value)
     if not path.is_absolute():
@@ -47,7 +51,7 @@ def resolve_project_dataset_root() -> Path:
 def resolve_project_experiments_root() -> Path:
     project_root = resolve_project_root()
     raw_value = os.getenv("__PROJECT_EXP_FOLDER__")
-    if not raw_value:
+    if not raw_value or _is_default_placeholder(raw_value):
         return project_root / "experiments"
     path = Path(raw_value)
     if not path.is_absolute():
