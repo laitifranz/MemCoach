@@ -187,6 +187,8 @@ bash scripts/schedule_python.sh src/analysis/editing_metrics.py --root experimen
 
 ## Interactive Demo
 
+Test out MemCoach in real time by capturing images directly from your mobile device through a FastAPI backend exposed via ngrok.
+
 > [!NOTE]
 > - Since the camera access on mobile devices requires a secure context, we need to use a proxy to forward the requests to the FastAPI server via HTTPS. We use ngrok for this purpose
 > - API requests are logged in the `outputs/api_requests` directory. Check [web/camera/README.md](web/camera/README.md) for more information
@@ -217,7 +219,7 @@ https://<your_ngrok_subdomain>.ngrok-free.dev/camera/?api=https://<your_ngrok_su
 
 ## Reproducing Paper Results
 
-For transparency and reproducibility, we provide our evaluation artifacts for MemCoach on InternVL3.5-8B model. We report the IR and RM metrics.
+For transparency and reproducibility, we provide [our evaluation artifacts](https://huggingface.co/datasets/laitifranz/MemBench-InternVL3.5-Eval) for MemCoach on InternVL3.5-8B model. We report the IR and RM metrics.
 
 **Option A — Compact download (recommended):** A single zip archive containing all 4 experiment folders is available to avoid hitting the Hugging Face rate limit:
 
@@ -262,7 +264,7 @@ If you find this work useful to your research, please consider citing as:
 ```
 
 ## Acknowledgments
-Thanks to these great repositories: [dottxt-ai/outlines](https://github.com/dottxt-ai/outlines) to make structured output easy with LLMs, [google/python-fire](https://github.com/google/python-fire) to make CLI management easy, and [PPR10K](https://github.com/csjliang/PPR10K) for the PPR10K dataset.
+Thanks to these great repositories: [dottxt-ai/outlines](https://github.com/dottxt-ai/outlines) to make structured output easy with LLMs, [google/python-fire](https://github.com/google/python-fire) to make CLI management easy, [PPR10K](https://github.com/csjliang/PPR10K) for the PPR10M dataset, and [web-haptics](https://github.com/lochie/web-haptics) for the experimental haptic feedback solution in the web demo.
 
 The needs of this project led to a contribution back to the community: [PR #1728](https://github.com/dottxt-ai/outlines/pull/1728) was merged into `dottxt-ai/outlines`, improving the handling of multimodal chat inputs for Transformers models.
 
