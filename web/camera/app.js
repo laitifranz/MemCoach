@@ -1,3 +1,5 @@
+import { triggerHaptic } from "./haptics.js";
+
 const videoEl = document.getElementById("camera-feed");
 const canvasEl = document.getElementById("capture-canvas");
 const scoreBtn = document.getElementById("score-btn");
@@ -18,7 +20,6 @@ const badgeDelta = document.getElementById("badge-delta");
 const FEEDBACK_PLACEHOLDER =
   "Feedback will appear here after you run a score with feedback.";
 const MAX_HISTORY = 10;
-
 function deriveApiBase() {
   const override = new URLSearchParams(window.location.search).get("api");
   if (override) {
@@ -59,6 +60,7 @@ async function initCamera() {
     videoEl.srcObject = mediaStream;
   } catch (err) {
     showToast(`Camera error: ${err.message}`, true);
+    triggerHaptic("error");
   }
 }
 
@@ -78,6 +80,7 @@ async function healthCheck() {
     updateHealthChip("error", "Server offline");
     enableControls(false);
     showToast(`Health check failed: ${err.message}`, true);
+    triggerHaptic("error");
   }
 }
 
@@ -160,6 +163,7 @@ async function sendRequest(endpoint, mode = "score") {
     showOverlay(false);
     enableControls(true);
     showToast(err.message || "Request failed", true);
+    triggerHaptic("error");
   }
 }
 
@@ -181,6 +185,7 @@ function updateResult(payload, measuredLatency, mode = "score") {
   latencyLabel.textContent = latency ? `${latency.toFixed(0)} ms` : "";
 
   setFeedbackPreview(payload.feedback);
+  triggerHaptic("success");
   recordResult({
     score,
     formattedScore,
@@ -312,12 +317,19 @@ function computePercentDelta(diff, baselineScore) {
   return { text, variant };
 }
 
-scoreBtn.addEventListener("click", () => sendRequest(SCORE_ENDPOINT, "score"));
-scoreFeedbackBtn.addEventListener("click", () => sendRequest(SCORE_FEEDBACK_ENDPOINT, "score-feedback"));
+scoreBtn.addEventListener("click", () => {
+  triggerHaptic("selection");
+  sendRequest(SCORE_ENDPOINT, "score");
+});
+scoreFeedbackBtn.addEventListener("click", () => {
+  triggerHaptic("selection");
+  sendRequest(SCORE_FEEDBACK_ENDPOINT, "score-feedback");
+});
 feedbackChip.addEventListener("click", () => {
   if (!lastFeedback) return;
   dialogText.textContent = lastFeedback;
   feedbackDialog.showModal();
+  triggerHaptic("selection");
 });
 feedbackChip.addEventListener("keydown", (evt) => {
   if (!lastFeedback) return;
@@ -325,6 +337,7 @@ feedbackChip.addEventListener("keydown", (evt) => {
     evt.preventDefault();
     dialogText.textContent = lastFeedback;
     feedbackDialog.showModal();
+    triggerHaptic("selection");
   }
 });
 dialogClose.addEventListener("click", () => feedbackDialog.close());
@@ -344,6 +357,7 @@ document.addEventListener("visibilitychange", () => {
 
   if (!navigator.mediaDevices?.getUserMedia) {
     showToast("Camera API not supported", true);
+    triggerHaptic("error");
     return;
   }
   await initCamera();
