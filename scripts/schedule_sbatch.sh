@@ -12,12 +12,20 @@ fi
 print_usage() {
     cat <<'USAGE' >&2
 Usage:
-  bash scripts/schedule_sbatch.sh <config> [KEY=VALUE ...] <command ...>
+  bash scripts/schedule_sbatch.sh [--cluster <env>] [--cpu] [KEY=VALUE ...] <command ...>
 
 Examples:
-  bash scripts/schedule_sbatch.sh leonardo_gpu 'uv run runner.py --config_path .../runner.yaml'
-  bash scripts/schedule_sbatch.sh leonardo_gpu NUM_JOBS=8 SLURM_MEM=128GB \
-       'uv run runner.py --config_path ... --shard_id ${SLURM_ARRAY_TASK_ID}'
+  # Explicit cluster, default GPU config
+  bash scripts/schedule_sbatch.sh --cluster leonardo 'uv run runner.py --config_path .../runner.yaml'
+
+  # Explicit cluster, CPU config
+  bash scripts/schedule_sbatch.sh --cluster leonardo --cpu 'uv run runner.py --config_path .../runner.yaml'
+
+  # Auto-detect cluster from hostname, default GPU config
+  bash scripts/schedule_sbatch.sh 'uv run runner.py --config_path .../runner.yaml'
+
+  # Auto-detect cluster from hostname, CPU config
+  bash scripts/schedule_sbatch.sh --cpu 'uv run runner.py --config_path .../runner.yaml'
 
 Config variables loaded from scripts/slurm_configs/<config>.sh (overridable via KEY=VALUE):
   SLURM_PARTITION   → #SBATCH --partition
@@ -72,6 +80,33 @@ fi
 cd "$(dirname "$0")"
 while [ "$(find . -maxdepth 1 -name pyproject.toml | wc -l)" -ne 1 ]; do cd ..; done
 
+# parse cluster / cpu flags before anything else
+CLUSTER_ENV=""
+USE_CPU=0
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --cluster)
+            if [[ $# -lt 2 ]]; then
+                echo -e "${BOLD}${RED}[ERROR] --cluster requires a value (env key)${RESET}" >&2
+                exit 1
+            fi
+            CLUSTER_ENV="$2"
+            shift 2
+            ;;
+        --cpu)
+            USE_CPU=1
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
 # helper function to emit a block of code
 emit_hook_block() {
     local -n hook_ref=$1   # nameref to BEFORE_CODE_BLOCK or AFTER_CODE_BLOCK
@@ -82,19 +117,50 @@ emit_hook_block() {
     printf '%s\n' "${lines[@]}"
 }
 
-# read config name from first argument 
-CONFIG_NAME=${1:-}
-if [[ -z "$CONFIG_NAME" ]]; then
-    echo "Usage: $0 <config> <command...>" >&2
-    echo "Available configs:" >&2
-    ls ./scripts/slurm_configs/ | sed 's/\.sh$//' | sed 's/^/    /' >&2
-    echo "Example: bash schedule_sbatch.sh leonardo_gpu 'uv run runner.py --config_path <config_path>'" >&2
+source "./scripts/slurm_configs/cluster_env.sh"
+
+# resolve cluster env and config name
+ENV_KEY=""
+if [[ -n "$CLUSTER_ENV" ]]; then
+    # If CLUSTER_ENV is not a known key, try to resolve it as an alias
+    if [[ -z "${CLUSTER_ALIASES[$CLUSTER_ENV]+x}" ]]; then
+        for env in "${!CLUSTER_ALIASES[@]}"; do
+            for alias in ${CLUSTER_ALIASES[$env]}; do
+                if [[ "$alias" == "$CLUSTER_ENV" ]]; then
+                    CLUSTER_ENV="$env"
+                    break 2
+                fi
+            done
+        done
+    fi
+    ENV_KEY="$CLUSTER_ENV"
+    echo -e "${BOLD}${BLUE}[INFO] Explicit cluster env${RESET}: $ENV_KEY" >&2
+else
+    HOSTNAME_VALUE="$(hostname 2>/dev/null || echo "${HOSTNAME:-}")"
+    if ENV_KEY="$(detect_cluster_env)"; then
+        echo -e "${BOLD}${BLUE}[INFO] Automatic env detection${RESET}: env='$ENV_KEY' (hostname='$HOSTNAME_VALUE')" >&2
+    else
+        echo -e "${BOLD}${RED}[ERROR] Could not automatically detect cluster env from hostname${RESET}: $HOSTNAME_VALUE" >&2
+        echo -e "${BOLD}${YELLOW}[INFO] Known cluster env keys${RESET}: ${!CLUSTER_ALIASES[@]}" >&2
+        echo -e "${BOLD}${YELLOW}[INFO] Hint${RESET}: pass --cluster <env> explicitly." >&2
+        exit 1
+    fi
+fi
+
+if [[ "$USE_CPU" -eq 1 ]]; then
+    CONFIG_NAME="${ENV_KEY}_cpu"
+else
+    CONFIG_NAME="${ENV_KEY}_gpu"
+fi
+
+CONFIG_PATH="./scripts/slurm_configs/$CONFIG_NAME.sh"
+if [[ ! -f "$CONFIG_PATH" ]]; then
+    echo -e "${BOLD}${RED}[ERROR] Config file not found for env${RESET}: CONFIG_NAME='$CONFIG_NAME' (expected at $CONFIG_PATH)" >&2
     exit 1
 fi
 
-echo -e "${BOLD}${BLUE}[INFO] Sourcing config${RESET}: $CONFIG_NAME" >&2
-source "./scripts/slurm_configs/$CONFIG_NAME.sh"
-shift
+echo -e "${BOLD}${BLUE}[INFO] Using config${RESET}: $CONFIG_NAME" >&2
+source "$CONFIG_PATH"
 
 readarray -t VALID_OVERRIDE_KEYS <<'EOF'
 SLURM_PARTITION
