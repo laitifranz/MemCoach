@@ -3,8 +3,7 @@ import os
 import logging
 from tqdm import tqdm
 
-from torch.utils.data import DataLoader
-from torch.utils.data.sampler import SubsetRandomSampler
+from torch.utils.data import DataLoader, Subset
 
 
 from src.pipelines.zero_shot.input.schemas import ConstrainedActionListOutput
@@ -38,20 +37,18 @@ def main(config_path: str, overwrite: bool = False, dry_run: bool = False):
             return
 
     scene_pairs_dataset = ScenePairsDataset(config["data"])
+    start, stop = get_start_stop_index(len(scene_pairs_dataset))
+    shard_dataset = Subset(scene_pairs_dataset, indices=range(start, stop))
+
     scene_dataloader = DataLoader(
-        scene_pairs_dataset,
+        shard_dataset,
         batch_size=config["model"].get("batch_size", 8),
         shuffle=False,
         collate_fn=lambda x: x,
-        sampler=SubsetRandomSampler(
-            indices=range(*get_start_stop_index(len(scene_pairs_dataset)))
-        ),
     )
 
     config["statistics"]["total_dataset_size"] = len(scene_pairs_dataset)
-    config["statistics"]["subset_processed_size"] = len(scene_dataloader) * config[
-        "model"
-    ].get("batch_size", 8)
+    config["statistics"]["subset_processed_size"] = len(shard_dataset)
 
     if not dry_run:
         model = get_model(config["model"])

@@ -59,7 +59,6 @@ def main(
         batch_size=config["editing_model"]["model"].get("batch_size", 8),
         shuffle=False,
         collate_fn=lambda x: x,
-        # sampler=SubsetRandomSampler(indices=range(*get_start_stop_index(len(feedback_pairs_dataset))))
     )
 
     config["statistics"]["total_dataset_size"] = len(grouped_dataset_with_criteria)
