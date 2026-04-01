@@ -1,0 +1,45 @@
+# MemCoach
+
+> MemCoach is a training-free multimodal large language model (MLLM) framework that provides actionable, human-readable feedback to help users take more memorable photographs. It was accepted at CVPR 2026.
+
+MemCoach uses activation steering — no fine-tuning required — to guide a vision-language model (InternVL3.5-8B by default) toward generating grounded, contrastive feedback on image memorability. It ships alongside MemBench, a new benchmark dataset for evaluating memorability feedback quality.
+
+- **Paper**: https://arxiv.org/abs/2602.21877
+- **Project page**: https://laitifranz.github.io/MemCoach/
+- **Dataset (MemBench)**: https://huggingface.co/datasets/laitifranz/MemBench
+- **Evaluation artifacts**: https://huggingface.co/datasets/laitifranz/MemBench-InternVL3.5-Eval
+- **License**: Apache-2.0
+
+## Setup
+
+- [README – Installation & quickstart](https://github.com/laitifranz/MemCoach/blob/main/README.md)
+- [pyproject.toml – Dependencies](https://github.com/laitifranz/MemCoach/blob/main/pyproject.toml)
+
+## Pipeline
+
+The pipeline has three main stages:
+
+- **Stage A – Contrastive data generation**: teacher (MemBench-style) and student (zero-shot) generation via `src/pipelines/membench_gen/` and `src/pipelines/zero_shot/`
+- **Stage B – Steering vector extraction**: positive and negative activation extraction via `src/pipelines/method/training.py`
+- **Stage C – MemCoach inference**: steered inference via `src/pipelines/method/inference.py`
+
+Pre-built steering vectors for InternVL3.5-8B are available in `ckpt/memcoach/`.
+
+- [Config files – Pipeline configuration](https://github.com/laitifranz/MemCoach/tree/main/config)
+- [Scripts – SLURM scheduling utilities](https://github.com/laitifranz/MemCoach/tree/main/scripts)
+- [Source code](https://github.com/laitifranz/MemCoach/tree/main/src)
+
+## Reproducing Paper Results
+
+Pre-computed evaluation artifacts for InternVL3.5-8B are hosted on Hugging Face. Download and run `src/analysis/editing_metrics.py` to reproduce IR and RM metrics reported in the paper.
+
+## Citation
+
+```bibtex
+@inproceedings{laiti2026memcoach,
+  title={How to Take a Memorable Picture? Empowering Users with Actionable Feedback},
+  author={Laiti, Francesco and Talon, Davide and Staiano, Jacopo and Ricci, Elisa},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  year={2026}
+}
+```

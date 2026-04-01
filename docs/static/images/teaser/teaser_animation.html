@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MemCoach Live Demo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── CAMERA SHELL ── */
+  .camera-shell {
+    width: min(480px, 100vw);
+    background: #0a0a0a;
+    border-radius: 32px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── VIEWFINDER (1:1) ── */
+  .viewfinder-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #000;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .media-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  #img-before { z-index: 1; opacity: 1; transition: opacity 0.5s; }
+  #img-after  { z-index: 1; opacity: 0; transition: opacity 0.5s; }
+  #vid-transition { z-index: 2; opacity: 0; transition: opacity 0.4s; }
+
+  /* Gradient scrim */
+  .overlay-gradient {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.22) 0%,
+      rgba(0,0,0,0)    25%,
+      rgba(0,0,0,0)    60%,
+      rgba(0,0,0,0.35) 100%
+    );
+    pointer-events: none;
+  }
+
+  /* ── VIEWFINDER CHROME ── */
+  .vf-chrome {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+  }
+
+  /* Rule-of-thirds grid */
+  .vf-grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+  }
+  .vf-grid.visible { opacity: 1; }
+  .vf-grid-cell { border: 0.5px solid rgba(255,255,255,0.11); }
+
+  /* Focus square */
+  .vf-focus {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 96px; height: 96px;
+    transform: translate(-50%, -50%) scale(1.4);
+    border: 1.5px solid rgba(255,220,80,0);
+    border-radius: 6px;
+    transition: transform 0.5s ease, border-color 0.3s ease, opacity 0.4s ease;
+    opacity: 0;
+  }
+  .vf-focus.locking {
+    transform: translate(-50%, -50%) scale(1.0);
+    border-color: rgba(255,220,80,0.9);
+    opacity: 1;
+  }
+  .vf-focus.locked {
+    border-color: rgba(255,220,80,0.35);
+    opacity: 0.6;
+  }
+
+  /* ── SHUTTER FLASH ── */
+  .vf-shutter-flash {
+    position: absolute;
+    inset: 0;
+    z-index: 25;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .vf-shutter-flash.flash {
+    animation: shutter-flash 0.35s ease-out forwards;
+  }
+  @keyframes shutter-flash {
+    0%   { opacity: 0.85; }
+    100% { opacity: 0; }
+  }
+
+  /* ── SCORE CHIP ── */
+  .chip-score {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    padding: 9px 36px;
+    border-radius: 50px;
+    font-weight: 700;
+    color: white;
+    white-space: nowrap;
+    backdrop-filter: blur(12px);
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .chip-score.visible { transform: translateX(-50%) translateY(0); }
+  .chip-score.bad  { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+  .chip-score.good { background: linear-gradient(135deg, #2d86ff, #1a5cbf); }
+
+  .chip-score .score-label {
+    font-size: 10px;
+    font-weight: 500;
+    opacity: 0.85;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .chip-score .score-value { font-size: 21px; font-weight: 700; line-height: 1; }
+  .chip-score .score-emoji { font-size: 17px; }
+
+  /* ── FEEDBACK CHIP ── */
+  .chip-feedback {
+    position: absolute;
+    bottom: 16px;
+    left: 12px;
+    right: 12px;
+    z-index: 10;
+    background: white;
+    border-radius: 16px;
+    padding: 13px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.24);
+    transform: translateY(110px);
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .chip-feedback.visible { transform: translateY(0); }
+
+  .chip-feedback .logo-wrap {
+    width: 40px; height: 40px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: #f5f5f5;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .chip-feedback .logo-wrap img { width: 34px; height: 34px; object-fit: contain; }
+
+  .chip-feedback .feedback-text {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a2e;
+    line-height: 1.35;
+  }
+  .chip-feedback .feedback-text span {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    color: #999;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── CONFETTI ── */
+  .confetti-container {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .confetti-container.active { opacity: 1; }
+  .confetti-piece {
+    position: absolute;
+    top: -10px;
+    animation: confetti-fall linear forwards;
+  }
+  @keyframes confetti-fall {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    80%  { opacity: 1; }
+    100% { transform: translateY(520px) rotate(720deg); opacity: 0; }
+  }
+
+  /* ── MODE SELECTOR ── */
+  .cam-mode-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 0 10px;
+    flex-shrink: 0;
+  }
+  .cam-mode {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    cursor: default;
+    transition: color 0.3s;
+    min-width: 80px;
+    text-align: center;
+    line-height: 1;
+  }
+  .cam-mode.active {
+    color: #ffe066;
+  }
+
+  /* ── SHUTTER BAR ── */
+  .cam-shutter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 36px 20px;
+    flex-shrink: 0;
+  }
+
+  /* Thumbnail of last shot */
+  .cam-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.2);
+    flex-shrink: 0;
+    transition: border-color 0.4s;
+  }
+  .cam-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .cam-thumb.updated { border-color: rgba(255,255,255,0.7); }
+
+  /* Shutter button */
+  .cam-shutter {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    border: 3.5px solid rgba(255,255,255,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    animation: shutter-breathe 2.4s ease-in-out infinite;
+  }
+  .cam-shutter-inner {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: white;
+    transition: transform 0.12s ease, background 0.2s;
+  }
+  .cam-shutter.snap .cam-shutter-inner {
+    transform: scale(0.82);
+    background: rgba(255,255,255,0.7);
+  }
+  @keyframes shutter-breathe {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.0); }
+    50%       { box-shadow: 0 0 0 6px rgba(255,255,255,0.08); }
+  }
+
+  /* Flip camera icon */
+  .cam-flip {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.65;
+  }
+  .cam-flip svg {
+    width: 26px; height: 26px;
+    stroke: white; fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>
+</head>
+<body>
+
+<div class="camera-shell">
+
+
+  <!-- 1:1 Viewfinder -->
+  <div class="viewfinder-wrap">
+
+    <img id="img-before" class="media-layer" src="assets/photo_before.jpg" alt="Before">
+    <img id="img-after"  class="media-layer" src="assets/photo_after.jpg"  alt="After">
+    <video id="vid-transition" class="media-layer" muted playsinline preload="auto">
+      <source src="assets/kling_blend_frames.mp4" type="video/mp4">
+    </video>
+
+    <div class="overlay-gradient"></div>
+
+    <!-- Viewfinder chrome -->
+    <div class="vf-chrome">
+      <div class="vf-grid" id="vf-grid">
+        <div class="vf-grid-cell"></div><div class="vf-grid-cell"></div><div class="vf-grid-cell"></div>
+        <div class="vf-grid-cell"></div><div class="vf-grid-cell"></div><div class="vf-grid-cell"></div>
+        <div class="vf-grid-cell"></div><div class="vf-grid-cell"></div><div class="vf-grid-cell"></div>
+      </div>
+      <div class="vf-focus" id="vf-focus"></div>
+    </div>
+
+    <!-- Score chip -->
+    <div class="chip-score bad" id="chip-score">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="score-label">Memorability</div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div class="score-value" id="score-value">0.64</div>
+          <div class="score-emoji" id="score-emoji">👎</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feedback chip -->
+    <div class="chip-feedback" id="chip-feedback">
+      <div class="logo-wrap">
+        <img src="assets/logo_memcoach.png" alt="MemCoach">
+      </div>
+      <div class="feedback-text">
+        <span>MemCoach suggests</span>
+        Bring them closer, both should smile and face each other
+      </div>
+    </div>
+
+    <!-- Confetti -->
+    <div class="confetti-container" id="confetti"></div>
+
+    <!-- Shutter flash -->
+    <div class="vf-shutter-flash" id="vf-flash"></div>
+
+  </div><!-- /viewfinder-wrap -->
+
+  <!-- Mode selector -->
+  <div class="cam-mode-bar">
+    <div class="cam-mode">Video</div>
+    <div class="cam-mode active">Photo</div>
+    <div class="cam-mode">Portrait</div>
+  </div>
+
+  <!-- Shutter bar -->
+  <div class="cam-shutter-bar">
+    <div class="cam-thumb" id="cam-thumb">
+      <img src="assets/photo_before.jpg" alt="last shot" id="thumb-img">
+    </div>
+    <div class="cam-shutter" id="cam-shutter">
+      <div class="cam-shutter-inner"></div>
+    </div>
+    <div class="cam-flip">
+      <svg viewBox="0 0 24 24">
+        <polyline points="1 4 1 10 7 10"/>
+        <polyline points="23 20 23 14 17 14"/>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+      </svg>
+    </div>
+  </div>
+
+</div><!-- /camera-shell -->
+
+<script>
+const imgBefore  = document.getElementById('img-before');
+const imgAfter   = document.getElementById('img-after');
+const vidTrans   = document.getElementById('vid-transition');
+const chipScore  = document.getElementById('chip-score');
+const scoreValue = document.getElementById('score-value');
+const scoreEmoji = document.getElementById('score-emoji');
+const chipFeed   = document.getElementById('chip-feedback');
+const confetti   = document.getElementById('confetti');
+const vfGrid     = document.getElementById('vf-grid');
+const vfFocus    = document.getElementById('vf-focus');
+const camShutter = document.getElementById('cam-shutter');
+const camThumb   = document.getElementById('cam-thumb');
+const thumbImg   = document.getElementById('thumb-img');
+const vfFlash    = document.getElementById('vf-flash');
+
+let loopTimer = null;
+
+function snapShutter() {
+  camShutter.classList.add('snap');
+  setTimeout(() => camShutter.classList.remove('snap'), 200);
+  // Viewfinder flash
+  vfFlash.classList.remove('flash');
+  void vfFlash.offsetWidth; // reflow
+  vfFlash.classList.add('flash');
+}
+
+function updateThumb(src) {
+  thumbImg.src = src;
+  camThumb.classList.add('updated');
+  setTimeout(() => camThumb.classList.remove('updated'), 800);
+}
+
+function reset() {
+  imgBefore.style.opacity = '1';
+  imgAfter.style.opacity  = '0';
+  vidTrans.style.opacity  = '0';
+  vidTrans.pause();
+  vidTrans.currentTime = 0;
+
+  chipScore.classList.remove('visible', 'good');
+  chipScore.classList.add('bad');
+  scoreValue.textContent = '0.64';
+  scoreEmoji.textContent = '👎';
+
+  chipFeed.classList.remove('visible');
+  confetti.classList.remove('active');
+  confetti.innerHTML = '';
+
+  vfGrid.classList.remove('visible');
+  vfFocus.classList.remove('locking', 'locked');
+  thumbImg.src = 'assets/photo_before.jpg';
+
+  clearTimeout(loopTimer);
+  loopTimer = setTimeout(phase0, 600);
+}
+
+function phase0() {
+  // Grid + focus lock, then disappears after locking
+  vfGrid.classList.add('visible');
+  setTimeout(() => {
+    vfFocus.classList.add('locking');
+    setTimeout(() => {
+      vfFocus.classList.remove('locking');
+      vfFocus.classList.add('locked');
+      setTimeout(() => vfGrid.classList.remove('visible'), 700);
+      // Focus ring fades out shortly after locking
+      setTimeout(() => vfFocus.classList.remove('locked'), 900);
+    }, 550);
+  }, 280);
+
+  // Score chip after 2s
+  loopTimer = setTimeout(() => {
+    chipScore.classList.add('visible');
+    loopTimer = setTimeout(phase1, 2000);
+  }, 2000);
+}
+
+function phase1() {
+  chipFeed.classList.add('visible');
+  loopTimer = setTimeout(phase2, 1100);
+}
+
+function phase2() {
+  setTimeout(() => {
+    vidTrans.style.opacity = '1';
+    vidTrans.play().catch(() => {});
+  }, 300);
+
+  vidTrans.onended = phase3;
+  loopTimer = setTimeout(phase3, 9000);
+}
+
+function phase3() {
+  clearTimeout(loopTimer);
+  vidTrans.onended = null;
+
+  // Shutter snaps at the moment the video ends
+  snapShutter();
+
+  imgAfter.style.opacity  = '1';
+  imgBefore.style.opacity = '0';
+  setTimeout(() => { vidTrans.style.opacity = '0'; }, 400);
+
+  // Thumbnail updates to the after shot
+  setTimeout(() => updateThumb('assets/photo_after.jpg'), 300);
+
+  chipScore.classList.remove('bad');
+  chipScore.classList.add('good');
+  scoreValue.textContent = '0.92';
+  scoreEmoji.textContent = '👍';
+
+  shootConfetti();
+  loopTimer = setTimeout(reset, 4000);
+}
+
+// ── Confetti ──
+const COLORS = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff6bdb','#ff9f43'];
+
+function shootConfetti() {
+  confetti.classList.add('active');
+  confetti.innerHTML = '';
+  for (let i = 0; i < 52; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left       = Math.random() * 100 + '%';
+    el.style.background = COLORS[Math.floor(Math.random() * COLORS.length)];
+    const size = 6 + Math.random() * 8;
+    el.style.width        = size + 'px';
+    el.style.height       = size + 'px';
+    el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    const dur   = 1.5 + Math.random() * 1.5;
+    const delay = Math.random() * 0.8;
+    el.style.animation = `confetti-fall ${dur}s ${delay}s linear forwards`;
+    confetti.appendChild(el);
+  }
+  setTimeout(() => confetti.classList.remove('active'), 3200);
+}
+
+// Boot
+loopTimer = setTimeout(phase0, 800);
+</script>
+</body>
+</html>
