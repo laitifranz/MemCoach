@@ -1,6 +1,6 @@
 # MemCoach
 
-> MemCoach is a training-free multimodal large language model (MLLM) framework that provides actionable, human-readable feedback to help users take more memorable photographs. It was accepted at CVPR 2026.
+> MemCoach is a training-free multimodal large language model (MLLM) framework that provides actionable, human-readable feedback to help users take more memorable photographs. It was accepted at CVPR 2026 (Highlight).
 
 MemCoach uses activation steering — no fine-tuning required — to guide a vision-language model (InternVL3.5-8B by default) toward generating grounded, contrastive feedback on image memorability. It ships alongside MemBench, a new benchmark dataset for evaluating memorability feedback quality.
 
