@@ -3,6 +3,7 @@ from src.pipelines.data.feedback_pairs_dataset import FeedbackPairsDataset
 from src.models.image_text_to_text.utils.prompt_builder import PromptBuilder
 from src.pipelines.method.input.prompts import SYSTEM_PROMPT, USER_PROMPT
 from src.pipelines.method.core.activation_steer import SteeringActivationsInjector
+from src.pipelines.evaluation.perplexity.perplexity import prepare_perplexity_batch
 from src.utils._runtime_paths import resolve_project_relative_path
 
 import torch
@@ -113,6 +114,29 @@ class InferenceManager:
             ):
                 output = self._model.generate(prompt, output_schema, **kwargs)
         return output
+
+    def compute_perplexity(self, prompt: inputs.Chat) -> float:
+        batch, labels = prepare_perplexity_batch(self._model, prompt)
+        device = next(self._model.raw_model.parameters()).device
+        dtype = next(self._model.raw_model.parameters()).dtype
+        batch = {
+            k: v.to(device) if isinstance(v, torch.Tensor) else v
+            for k, v in batch.items()
+        }
+        labels = labels.to(device)
+        with (
+            torch.no_grad(),
+            torch.autocast(device_type=self._model.device, dtype=dtype),
+        ):
+            with SteeringActivationsInjector(
+                self._model,
+                self._steering_vector,
+                self._target_layer,
+                self._module,
+                self._coeff,
+            ):
+                out = self._model.raw_model(**batch, labels=labels)
+        return out.loss.exp().item()
 
 
 if __name__ == "__main__":

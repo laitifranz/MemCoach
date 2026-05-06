@@ -1,0 +1,14 @@
+task_name: "evaluation/perplexity/zero_shot"
+
+data:
+  dataset_name: "ppr10k"
+  feedback_dataset_path: "experiments/ppr10k_data_student/ppr10k/InternVL3_5-8B-HF/zero_shot_memorability_prompt"
+  testset_scenes_path: "config/test_set_scenes_seed42.json"
+  filter_criteria: "less_higher_two_elements"
+
+model:
+  provider: "hf"
+  name: "OpenGVLab/InternVL3_5-8B-HF"
+
+prompt:
+  version: "inference_prompt"
