@@ -35,6 +35,7 @@
 
 ## Updates
 
+- **[Jun 17, 2026]** Demos are live!
 - **[Mar 02, 2026]** MemCoach is live!
 - **[Feb 28, 2026]** MemBench is live!
 - **[Feb 26, 2026]** Arxiv paper is live!
@@ -70,10 +71,11 @@ The default lockfile targets the standard PyTorch wheels for maximum compatibili
 
 ```bash
 uv pip install -U torch==2.9.1 torchvision==0.24.1 torchaudio==2.9.1 --index-url https://download.pytorch.org/whl/cu130
-uv pip install https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.9.0/flash_attn-2.8.3+cu130torch2.9-cp312-cp312-linux_x86_64.whl # check out https://mjunya.com/flash-attention-prebuild-wheels/ for your flash attn wheel version
+uv pip install https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.9.0/flash_attn-2.8.3+cu130torch2.9-cp312-cp312-linux_x86_64.whl
 ```
+Check out this awesome page [mjunya.com/flash-attention-prebuild-wheels](https://mjunya.com/flash-attention-prebuild-wheels/) for pre-built flash attn wheels.
 
-Note that after running these commands, `uv sync` or `uv run` would restore the locked versions; **activate** instead the virtual environment and run python normally to use the new versions.
+Note that after running these commands, `uv sync` or `uv run` would restore the locked versions; **activate** instead the virtual environment and run python normally to use the new versions, or use `bash scripts/schedule_python.sh`.
 
 
 ### 2. (Optional) Setup environment variables
