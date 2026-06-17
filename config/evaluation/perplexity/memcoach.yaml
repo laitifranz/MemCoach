@@ -1,0 +1,14 @@
+task_name: "evaluation/perplexity/memcoach"
+
+data:
+  dataset_name: "ppr10k"
+  feedback_dataset_path: "experiments/activation_inference_ppr10k/ppr10k/InternVL3_5-8B-HF/inference_prompt"
+  testset_scenes_path: "config/test_set_scenes_seed42.json"
+  filter_criteria: "less_higher_two_elements"
+
+model:
+  provider: "hf"
+  name: "OpenGVLab/InternVL3_5-8B-HF"
+
+prompt:
+  version: "inference_prompt"
