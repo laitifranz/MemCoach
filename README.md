@@ -64,6 +64,18 @@ pip install -e .
 > [!NOTE] 
 For those who are not familiar with uv, `uv run` is a command that activate at runtime the virtual environment while running the command.
 
+#### CUDA 13 / newer GPUs
+
+The default lockfile targets the standard PyTorch wheels for maximum compatibility. If your machine requires CUDA 13 (e.g. newer NVIDIA driver/GPU stacks), you can install the cu130 builds of PyTorch and a prebuilt flash-attn wheel instead, without modifying the project files:
+
+```bash
+uv pip install -U torch==2.9.1 torchvision==0.24.1 torchaudio==2.9.1 --index-url https://download.pytorch.org/whl/cu130
+uv pip install https://github.com/mjun0812/flash-attention-prebuild-wheels/releases/download/v0.9.0/flash_attn-2.8.3+cu130torch2.9-cp312-cp312-linux_x86_64.whl # check out https://mjunya.com/flash-attention-prebuild-wheels/ for your flash attn wheel version
+```
+
+Note that after running these commands, `uv sync` or `uv run` would restore the locked versions; **activate** instead the virtual environment and run python normally to use the new versions.
+
+
 ### 2. (Optional) Setup environment variables
 > You can skip this step if you are not using OpenRouter API or if you are using the default paths.
 
@@ -187,7 +199,16 @@ bash scripts/schedule_python.sh src/analysis/editing_metrics.py --root experimen
 
 ## Interactive Demo
 
-Test out MemCoach in real time by capturing images directly from your mobile device through a FastAPI backend exposed via ngrok.
+We provide two interactive demos to test out MemCoach in real time:
+
+| Demo | What it does | Entry point |
+|---|---|---|
+| **Demo 1 — Live Camera Coach** | Capture a photo from your mobile device and receive a memorability score plus actionable feedback in real time | `src/api/camera_app.py` |
+| **Demo 2 — Before/After Studio** | Upload a photo; MemCoach scores it, generates feedback, automatically applies the edit with FLUX.2-klein, re-scores the result, and ranks your improvement on a live leaderboard | `src/api/studio_app.py` |
+
+### Demo 1 — Live Camera Coach
+
+Capture images directly from your mobile device through a FastAPI backend exposed via ngrok. You take a picture from your phone and MemCoach returns a memorability score and actionable feedback to improve your shot.
 
 > [!NOTE]
 > - Since the camera access on mobile devices requires a secure context, we need to use a proxy to forward the requests to the FastAPI server via HTTPS. We use ngrok for this purpose
@@ -206,7 +227,7 @@ Save the ngrok forward URL for later use.
 ##### 1.2 Start the FastAPI server:
 
 ```bash
-PYTHONPATH=$(pwd) uv run -m uvicorn src.api.app:app --host 0.0.0.0 --port 8000
+bash scripts/schedule_python.sh -m uvicorn src.api.camera_app:app --host 0.0.0.0 --port 8000
 ```
 
 #### 2. Connect to the ngrok tunnel from your mobile device via browser:
@@ -215,6 +236,29 @@ https://<your_ngrok_subdomain>.ngrok-free.dev/camera/?api=https://<your_ngrok_su
 ```
 
 #### 3. Enjoy! :tada:
+
+### Demo 2 — Before/After Studio
+
+Upload or capture a photo and let MemCoach do the full makeover: the server scores the memorability of your image, generates actionable feedback, applies the suggested edit automatically with [FLUX.2-klein](https://huggingface.co/black-forest-labs/FLUX.2-klein-9B), and re-scores the edited result. You get the before/after images side by side, both memorability scores, and a live leaderboard ranking the best improvements across all participants.
+
+#### 1. Start the FastAPI server:
+
+```bash
+bash scripts/schedule_python.sh -m uvicorn src.api.studio_app:app --host 0.0.0.0 --port 8020
+```
+
+#### 2. Open the web UI in a browser:
+
+```bash
+https://<your_ngrok_subdomain>.ngrok-free.dev/studio/
+```
+
+#### 3. Enjoy! :tada:
+
+> [!NOTE]
+> - Demo settings (FLUX model, memorability checkpoint, steering config) are configured in the `config/api/studio_server.yaml` file
+> - All three models (memorability predictor, feedback VLM, FLUX.2-klein) are loaded at startup, so the first launch may take a while (model weights are downloaded on first use) and requires a GPU with significant memory
+> - Each request is logged in the `outputs/studio_requests` directory (source image, edited image, and metadata), and leaderboard entries are stored in `outputs/studio_leaderboard.db`
 
 
 ## Reproducing Paper Results

@@ -229,7 +229,7 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(
-        "src.api.app:app",
+        "src.api.camera_app:app",
         host=settings.runtime.host,
         port=settings.runtime.port,
         reload=False,

@@ -37,6 +37,6 @@ class ApiSettings(BaseModel):
 
 @lru_cache
 def get_settings() -> ApiSettings:
-    config_path = PROJECT_ROOT / "config/api/server.yaml"
+    config_path = PROJECT_ROOT / "config/api/camera_server.yaml"
     cfg = OmegaConf.to_container(OmegaConf.load(config_path), resolve=True)
     return ApiSettings(**cfg)

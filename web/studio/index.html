@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>MemCoach Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="state-idle">
+
+    <!-- ── Header ── -->
+    <header class="app-header">
+      <div class="header-left">
+        <span class="app-title">MemCoach</span>
+        <span id="healthChip" class="health-chip offline">●</span>
+        <span id="connectedCount" class="connected-count" hidden></span>
+      </div>
+      <button id="leaderboardBtn" class="icon-btn" aria-label="Leaderboard" title="Leaderboard">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="6" height="18" rx="1"/><rect x="9" y="8" width="6" height="13" rx="1"/><rect x="16" y="13" width="6" height="8" rx="1"/>
+        </svg>
+        <span id="editCountBadge" class="count-badge" hidden>0</span>
+      </button>
+    </header>
+
+    <!-- ── Camera view (idle state) ── -->
+    <section class="camera-section">
+      <div class="camera-frame">
+        <video id="videoEl" autoplay playsinline muted></video>
+        <canvas id="canvasEl" hidden></canvas>
+      </div>
+    </section>
+
+    <!-- ── Processing view ── -->
+    <section class="processing-section">
+      <div class="frozen-preview">
+        <img id="frozenPreview" alt="Captured frame" />
+      </div>
+      <div class="progress-steps">
+        <div class="step" id="step1">
+          <span class="step-dot"></span>
+          <span class="step-label">Analyzing memorability</span>
+        </div>
+        <div class="step" id="step2">
+          <span class="step-dot"></span>
+          <span class="step-label">Generating feedback</span>
+        </div>
+        <div class="step" id="step3">
+          <span class="step-dot"></span>
+          <span class="step-label">Editing with FLUX</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Result view ── -->
+    <section class="result-section">
+      <div class="compare-wrapper" id="compareWrapper">
+        <div class="compare-container" id="compareContainer">
+          <!-- Before image -->
+          <div class="compare-side before-side">
+            <img id="imgBefore" alt="Before" />
+            <span class="img-label before-label">BEFORE</span>
+            <div class="score-badge before-badge" id="scoreBefore">—</div>
+          </div>
+          <!-- After image (clipped) -->
+          <div class="compare-side after-side" id="afterSide">
+            <img id="imgAfter" alt="After" />
+            <span class="img-label after-label">AFTER</span>
+            <div class="score-badge after-badge" id="scoreAfter">—</div>
+          </div>
+          <!-- Divider handle -->
+          <div class="compare-divider" id="compareDivider">
+            <div class="divider-line"></div>
+            <div class="divider-handle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="15 18 9 12 15 6"/>
+                <polyline points="9 6 15 12 9 18" transform="translate(6,0)"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Score improvement badge -->
+      <div class="improvement-row" id="improvementRow">
+        <span class="improvement-chip" id="improvementChip"></span>
+        <span class="latency-label" id="latencyLabel"></span>
+      </div>
+
+      <!-- Feedback card -->
+      <div class="feedback-card" id="feedbackCard">
+        <span class="feedback-tag">MemCoach says</span>
+        <p class="feedback-text" id="feedbackText"></p>
+        <span class="model-chip">steered InternVL3.5-8B → FLUX.2-klein</span>
+      </div>
+
+      <div class="result-actions">
+        <button id="retryBtn" class="btn-primary">Try another shot</button>
+      </div>
+    </section>
+
+    <!-- ── Controls (idle) ── -->
+    <div class="controls-bar">
+      <button id="captureBtn" class="btn-capture" disabled>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M20.94 11A8.994 8.994 0 0 0 3.06 11"/>
+          <path d="M3.06 13A8.994 8.994 0 0 0 20.94 13"/>
+        </svg>
+        Capture &amp; Edit
+      </button>
+    </div>
+
+    <!-- ── Toast ── -->
+    <div id="toast" class="toast" role="alert" aria-live="assertive"></div>
+
+    <!-- ── Leaderboard modal ── -->
+    <div class="modal-backdrop" id="leaderboardBackdrop" hidden>
+      <div class="leaderboard-modal">
+        <div class="modal-header">
+          <h2 class="modal-title">Top Improvements</h2>
+          <button id="closeLeaderboard" class="icon-btn" aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <p class="leaderboard-subtitle" id="leaderboardSubtitle">Loading…</p>
+        <ol class="leaderboard-list" id="leaderboardList"></ol>
+      </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

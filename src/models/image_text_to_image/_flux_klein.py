@@ -22,8 +22,8 @@ class Flux2Klein(ImageTextToImageModel):
         return self._pipe(
             image=image,
             prompt=prompt,
-            height=1024,
-            width=1024,
+            # height=1024,
+            # width=1024,
             guidance_scale=1.0,
             num_inference_steps=4,
             generator=torch.manual_seed(0),

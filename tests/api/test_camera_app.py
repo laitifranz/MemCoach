@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 import pytest
 
-from src.api.app import app
+from src.api.camera_app import app
 
 
 @pytest.fixture
@@ -12,12 +12,12 @@ def client(monkeypatch):
     async def fake_run_feedback(image_path: str) -> str:
         return "Keep the framing tight around the subject."
 
-    monkeypatch.setattr("src.api.app.run_memorability", fake_run_memorability)
-    monkeypatch.setattr("src.api.app.run_feedback", fake_run_feedback)
-    monkeypatch.setattr("src.api.app.get_memorability_model", lambda: None)
-    monkeypatch.setattr("src.api.app.get_feedback_manager", lambda: None)
+    monkeypatch.setattr("src.api.camera_app.run_memorability", fake_run_memorability)
+    monkeypatch.setattr("src.api.camera_app.run_feedback", fake_run_feedback)
+    monkeypatch.setattr("src.api.camera_app.get_memorability_model", lambda: None)
+    monkeypatch.setattr("src.api.camera_app.get_feedback_manager", lambda: None)
     monkeypatch.setattr(
-        "src.api.app._save_request_artifacts", lambda *args, **kwargs: None
+        "src.api.camera_app._save_request_artifacts", lambda *args, **kwargs: None
     )
 
     with TestClient(app) as test_client:

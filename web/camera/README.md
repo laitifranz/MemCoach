@@ -1,10 +1,19 @@
 # MemCoach Camera MVP
 
-Minimal mobile-friendly web client that captures a camera frame, compresses it, and sends it to the FastAPI endpoints declared in `src/api/app.py`.
+Minimal mobile-friendly web client that captures a camera frame, compresses it, and sends it to the FastAPI endpoints declared in `src/api/camera_app.py`. This is the UI for **Demo 1 — Live Camera Coach**.
+
+> Looking for **Demo 2 — Before/After Studio** (upload a photo, get it auto-edited by FLUX.2-klein, and compete on the leaderboard)? Its UI lives in [`web/studio/`](../studio/) and is served by `src/api/studio_app.py`:
+>
+> ```bash
+> uv run python -m uvicorn src.api.studio_app:app --host 0.0.0.0 --port 8020
+> # then open http://<your_host>:8020/studio/
+> ```
+>
+> See the [Interactive Demo section of the main README](../../README.md#interactive-demo) for full instructions.
 
 ## Quick Start
 
-1. Start the FastAPI server (default host/port defined in `config/api/server.yaml`). If you leave the default `web/camera` directory in place, the app is automatically mounted at `http://<host>:<port>/camera`, so you can skip running a separate static server.
+1. Start the FastAPI server (default host/port defined in `config/api/camera_server.yaml`). If you leave the default `web/camera` directory in place, the app is automatically mounted at `http://<host>:<port>/camera`, so you can skip running a separate static server.
 2. (Optional) Serve this folder standalone if you prefer:
    ```bash
    cd web/camera
