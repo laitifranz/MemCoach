@@ -1,9 +1,10 @@
 <div align="center">
-
+    
+<a href="https://laitifranz.github.io/MemCoach/" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Project_Page-green" alt="Project Page"></a>
+<a href="https://arxiv.org/abs/2602.21877"><img alt="arXiv" src="https://img.shields.io/badge/arXiv_2602.21877-b31b1b?logo=arxiv&logoColor=white"></a>
 <a href="https://www.python.org"><img alt="Python" src="https://img.shields.io/badge/-Python_3.12-blue?logo=python&logoColor=white"></a>
 <a href="https://pytorch.org/get-started/locally/"><img alt="PyTorch" src="https://img.shields.io/badge/PyTorch_2.9-ee4c2c?logo=pytorch&logoColor=white"></a>
 <a href="https://github.com/huggingface/transformers"><img alt="transformers" src="https://img.shields.io/badge/transformers 4.57-FFBE00?logo=huggingface&logoColor=white&"></a>
-<a href="https://arxiv.org/abs/2602.21877"><img alt="arXiv" src="https://img.shields.io/badge/arXiv_2602.21877-b31b1b?logo=arxiv&logoColor=white"></a>
 <img alt="CVPR 2026" src="https://img.shields.io/badge/CVPR_2026-2563eb?style=flat&logo=ieee&logoColor=white">
 
 <div align="center">
