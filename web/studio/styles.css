@@ -194,7 +194,7 @@ body.state-result     .result-section      { display: flex; flex-direction: colu
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0,0,0,0.8);
 }
 
 #frozenPreview {
@@ -204,48 +204,43 @@ body.state-result     .result-section      { display: flex; flex-direction: colu
   display: block;
 }
 
-.progress-steps {
+.frozen-orb-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  width: 100%;
-  padding: 16px 0;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  pointer-events: none;
 }
 
-.step {
+.frozen-orb-stack {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+.frozen-orb-slot {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
-  opacity: 0.3;
-  transition: opacity 0.3s;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.45s ease;
 }
-.step.active  { opacity: 1; }
-.step.done    { opacity: 0.6; }
+.frozen-orb-slot.visible { opacity: 1; }
 
-.step-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--border);
-  flex-shrink: 0;
-  transition: background 0.3s;
-}
-.step.active .step-dot {
-  background: var(--green);
-  box-shadow: 0 0 0 3px rgba(0,193,106,0.2);
-  animation: pulse-dot 1.2s ease-in-out infinite;
-}
-.step.done .step-dot { background: var(--green); }
-
-@keyframes pulse-dot {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(0,193,106,0.2); }
-  50%       { box-shadow: 0 0 0 6px rgba(0,193,106,0.05); }
-}
-
-.step-label {
+.frozen-orb-label {
   font-size: 14px;
+  font-weight: 600;
   color: var(--text);
-  font-weight: 500;
+  text-align: center;
+  padding: 0 24px;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+  transition: opacity 0.25s ease;
 }
 
 /* ── Result section ── */

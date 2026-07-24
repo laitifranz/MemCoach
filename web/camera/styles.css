@@ -362,9 +362,37 @@ button:disabled {
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
   color: #fff;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
   font-size: 1.2rem;
+}
+
+.loading-orb-stack {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+.loading-orb-slot {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.loading-orb-slot.visible { opacity: 1; }
+
+.loading-orb-label {
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 0 24px;
+  transition: opacity 0.25s ease;
 }
 
 .hidden {

@@ -235,7 +235,7 @@ bash scripts/schedule_python.sh -m uvicorn src.api.camera_app:app --host 0.0.0.0
 
 #### 2. Connect to the ngrok tunnel from your mobile device via browser:
 ```bash
-https://<your_ngrok_subdomain>.ngrok-free.dev/camera/?api=https://<your_ngrok_subdomain>.ngrok-free.dev
+https://<your_ngrok_subdomain>.ngrok-free.dev/camera/
 ```
 
 #### 3. Enjoy! :tada:

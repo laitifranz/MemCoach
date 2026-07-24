@@ -1,4 +1,5 @@
 import { triggerHaptic } from "./haptics.js";
+import { renderOrb, clearOrb } from "./orb.js";
 
 // ---------------------------------------------------------------------------
 // API base URL resolution
@@ -35,11 +36,10 @@ const videoEl         = document.getElementById("videoEl");
 const canvasEl        = document.getElementById("canvasEl");
 const captureBtn      = document.getElementById("captureBtn");
 const frozenPreview   = document.getElementById("frozenPreview");
-const steps           = [
-  document.getElementById("step1"),
-  document.getElementById("step2"),
-  document.getElementById("step3"),
-];
+const frozenOrbSlots  = [document.getElementById("frozenOrbA"), document.getElementById("frozenOrbB")];
+const frozenOrbLabel  = document.getElementById("frozenOrbLabel");
+const STEP_ORB_STATES = ["solving", "composing", "shaping"];
+const STEP_LABELS     = ["Analyzing memorability", "Generating feedback", "Editing with FLUX"];
 const compareWrapper  = document.getElementById("compareWrapper");
 const compareContainer= document.getElementById("compareContainer");
 const compareDivider  = document.getElementById("compareDivider");
@@ -169,22 +169,40 @@ async function captureFrame() {
 // Progress animation (3 steps, 1.8 s each)
 // ---------------------------------------------------------------------------
 const STEP_DURATION_MS = 1800;
+const ORB_FADE_MS = 450; // keep in sync with .frozen-orb-slot transition-duration
+
+let activeOrbSlot = 0;
+
+function setOrbState(state, label) {
+  const nextEl = frozenOrbSlots[1 - activeOrbSlot];
+  const prevEl = frozenOrbSlots[activeOrbSlot];
+
+  renderOrb(nextEl, state, { size: 64, theme: "dark" });
+  nextEl.classList.add("visible");
+  prevEl.classList.remove("visible");
+  setTimeout(() => clearOrb(prevEl), ORB_FADE_MS);
+  activeOrbSlot = 1 - activeOrbSlot;
+
+  frozenOrbLabel.style.opacity = "0";
+  setTimeout(() => {
+    frozenOrbLabel.textContent = label;
+    frozenOrbLabel.style.opacity = "1";
+  }, ORB_FADE_MS / 2);
+}
 
 function startProgressAnimation() {
-  steps.forEach((s) => s.classList.remove("active", "done"));
   let current = 0;
 
   function advance() {
-    if (current > 0) steps[current - 1].classList.replace("active", "done");
-    if (current < steps.length) {
-      steps[current].classList.add("active");
+    if (current < STEP_LABELS.length) {
+      setOrbState(STEP_ORB_STATES[current], STEP_LABELS[current]);
       triggerHaptic("light");
       current++;
-      if (current < steps.length) setTimeout(advance, STEP_DURATION_MS);
+      if (current < STEP_LABELS.length) setTimeout(advance, STEP_DURATION_MS);
     }
   }
   advance();
-  return new Promise((resolve) => setTimeout(resolve, STEP_DURATION_MS * steps.length));
+  return new Promise((resolve) => setTimeout(resolve, STEP_DURATION_MS * STEP_LABELS.length));
 }
 
 // ---------------------------------------------------------------------------

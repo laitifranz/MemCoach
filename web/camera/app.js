@@ -1,10 +1,13 @@
 import { triggerHaptic } from "./haptics.js";
+import { renderOrb, clearOrb } from "./orb.js";
 
 const videoEl = document.getElementById("camera-feed");
 const canvasEl = document.getElementById("capture-canvas");
 const scoreBtn = document.getElementById("score-btn");
 const scoreFeedbackBtn = document.getElementById("score-feedback-btn");
 const overlay = document.getElementById("loading-overlay");
+const loadingOrbSlots = [document.getElementById("loadingOrbA"), document.getElementById("loadingOrbB")];
+const loadingOrbLabel = document.getElementById("loadingOrbLabel");
 const healthChip = document.getElementById("health-chip");
 const scoreValue = document.getElementById("score-value");
 const latencyLabel = document.getElementById("latency-label");
@@ -101,6 +104,55 @@ function showOverlay(show) {
   overlay.classList.toggle("hidden", !show);
 }
 
+// ---------------------------------------------------------------------------
+// Loading orb (thinking-orbs, crossfaded between the two slots)
+// ---------------------------------------------------------------------------
+const ORB_FADE_MS = 450; // keep in sync with .loading-orb-slot transition-duration
+const FEEDBACK_STAGE_DELAY_MS = 1100;
+
+let activeOrbSlot = 0;
+let feedbackStageTimer = null;
+
+function setOrbState(state, label) {
+  const nextEl = loadingOrbSlots[1 - activeOrbSlot];
+  const prevEl = loadingOrbSlots[activeOrbSlot];
+
+  renderOrb(nextEl, state, { size: 64, theme: "dark" });
+  nextEl.classList.add("visible");
+  prevEl.classList.remove("visible");
+  setTimeout(() => clearOrb(prevEl), ORB_FADE_MS);
+  activeOrbSlot = 1 - activeOrbSlot;
+
+  loadingOrbLabel.style.opacity = "0";
+  setTimeout(() => {
+    loadingOrbLabel.textContent = label;
+    loadingOrbLabel.style.opacity = "1";
+  }, ORB_FADE_MS / 2);
+}
+
+function startLoadingOrb(mode) {
+  clearTimeout(feedbackStageTimer);
+
+  if (mode !== "score-feedback") {
+    loadingOrbSlots.forEach((el) => {
+      el.classList.remove("visible");
+      clearOrb(el);
+    });
+    loadingOrbLabel.style.opacity = "1";
+    loadingOrbLabel.textContent = "Processing…";
+    return;
+  }
+
+  setOrbState("solving", "Analyzing memorability");
+  feedbackStageTimer = setTimeout(() => {
+    setOrbState("composing", "Generating feedback");
+  }, FEEDBACK_STAGE_DELAY_MS);
+}
+
+function stopLoadingOrb() {
+  clearTimeout(feedbackStageTimer);
+}
+
 function showToast(message, isError = false) {
   toastEl.textContent = message;
   toastEl.classList.toggle("error", isError);
@@ -142,6 +194,7 @@ function scaleDimensions(srcW, srcH, maxEdge) {
 async function sendRequest(endpoint, mode = "score") {
   try {
     showOverlay(true);
+    startLoadingOrb(mode);
     enableControls(false);
     const blob = await captureBlob();
     const form = new FormData();
@@ -158,9 +211,11 @@ async function sendRequest(endpoint, mode = "score") {
     const data = await res.json();
     updateResult(data, elapsed, mode);
     showOverlay(false);
+    stopLoadingOrb();
     enableControls(true);
   } catch (err) {
     showOverlay(false);
+    stopLoadingOrb();
     enableControls(true);
     showToast(err.message || "Request failed", true);
     triggerHaptic("error");
@@ -346,6 +401,7 @@ document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     enableControls(false);
     showOverlay(false);
+    stopLoadingOrb();
   } else if (healthChip.classList.contains("chip--ok")) {
     enableControls(true);
   }

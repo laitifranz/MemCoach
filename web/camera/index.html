@@ -22,7 +22,13 @@
       <section class="camera-panel">
         <video id="camera-feed" autoplay playsinline muted></video>
         <canvas id="capture-canvas" width="0" height="0"></canvas>
-        <div id="loading-overlay" class="overlay hidden">Processing…</div>
+        <div id="loading-overlay" class="overlay hidden">
+          <div class="loading-orb-stack">
+            <span class="loading-orb-slot" id="loadingOrbA"></span>
+            <span class="loading-orb-slot" id="loadingOrbB"></span>
+          </div>
+          <span class="loading-orb-label" id="loadingOrbLabel"></span>
+        </div>
       </section>
 
       <section class="controls">
